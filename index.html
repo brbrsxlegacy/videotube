@@ -752,5 +752,161 @@
     requestAnimationFrame(gameLoop);
     showHint('Başlangıç: 1 şef çalışıyor');
   </script>
+  <style>
+    #mainMenu{
+      position:fixed; inset:0; z-index:120;
+      display:flex; align-items:center; justify-content:center;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,.18), rgba(255,255,255,0) 35%),
+        linear-gradient(180deg, rgba(7,16,26,.90), rgba(10,22,36,.95));
+      backdrop-filter: blur(8px);
+    }
+    .menu-card{
+      width:min(560px, calc(100% - 28px));
+      background:linear-gradient(180deg,#172432,#0f1720);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:28px;
+      box-shadow:0 20px 50px rgba(0,0,0,.35);
+      padding:24px;
+      color:#fff;
+    }
+    .menu-title{font-size:40px;font-weight:1000;letter-spacing:.4px;margin:0 0 10px;}
+    .menu-sub{opacity:.8;line-height:1.5;margin-bottom:18px;}
+    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 18px;}
+    .menu-stat{background:rgba(255,255,255,.05);border-radius:18px;padding:14px;}
+    .menu-stat b{display:block;font-size:12px;opacity:.7;margin-bottom:6px;}
+    .menu-stat span{font-size:22px;font-weight:900;}
+    .menu-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .menu-btn{
+      border:none;border-radius:18px;padding:16px 14px;font-size:17px;font-weight:900;cursor:pointer;color:#fff;
+      box-shadow:var(--shadow), inset 0 3px 0 rgba(255,255,255,.18);
+    }
+    .menu-btn.play{background:linear-gradient(180deg,#2abf3d,#1b8b2a);}
+    .menu-btn.upgrades{background:linear-gradient(180deg,#2972ff,#1f55bd);}
+
+    #upgradePanel{
+      position:fixed; right:12px; top:88px; bottom:96px; z-index:110; width:min(390px, calc(100% - 24px));
+      transform:translateX(calc(100% + 24px)); transition:transform .28s ease;
+      pointer-events:none;
+    }
+    #upgradePanel.open{transform:translateX(0); pointer-events:auto;}
+    .up-card{
+      height:100%; background:linear-gradient(180deg,#172432,#0f1720); border:1px solid rgba(255,255,255,.08);
+      border-radius:24px; box-shadow:var(--shadow); padding:16px; display:flex; flex-direction:column; gap:12px;
+    }
+    .up-head{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+    .up-title{font-size:26px; font-weight:1000; margin:0;}
+    .close-btn{
+      width:42px;height:42px;border:none;border-radius:14px;cursor:pointer;font-size:22px;font-weight:900;color:#fff;
+      background:linear-gradient(180deg,#314153,#202c39);
+    }
+    .up-sub{opacity:.76;line-height:1.45;font-size:14px;}
+    .up-list{display:grid;gap:10px;overflow:auto;padding-right:4px;}
+    .up-item{
+      background:rgba(255,255,255,.05);border-radius:18px;padding:14px;border:1px solid rgba(255,255,255,.05);
+    }
+    .up-item-title{font-size:17px;font-weight:900;margin-bottom:4px;}
+    .up-item-desc{font-size:13px;opacity:.75;margin-bottom:10px;line-height:1.35;}
+    .up-buy{
+      width:100%;border:none;border-radius:14px;padding:12px 10px;cursor:pointer;color:#fff;font-weight:900;font-size:15px;
+      background:linear-gradient(180deg,#1e8a2a,#176a21);
+    }
+    .up-buy.blue{background:linear-gradient(180deg,#2972ff,#1f55bd);}
+    .up-buy.orange{background:linear-gradient(180deg,#ff9a3d,#dd6e10);}
+    .fab-upgrades{
+      position:fixed; right:16px; bottom:118px; z-index:111; width:64px; height:64px; border:none; border-radius:50%;
+      background:linear-gradient(180deg,#2abf3d,#1b8b2a); color:#fff; font-size:28px; font-weight:1000; cursor:pointer;
+      box-shadow:0 18px 30px rgba(0,0,0,.3), inset 0 3px 0 rgba(255,255,255,.18);
+    }
+    @media (max-width:700px){
+      .menu-title{font-size:32px;}
+      .menu-grid{grid-template-columns:1fr;}
+      .menu-actions{grid-template-columns:1fr;}
+      #upgradePanel{top:82px;bottom:88px;}
+    }
+  </style>
+
+  <div id="mainMenu">
+    <div class="menu-card">
+      <h1 class="menu-title">Idle Market Tycoon</h1>
+      <div class="menu-sub">Küçük bir marketle başla, şef kirala, yeni arsalar aç, kat yükselt ve dükkanı dev bir zincire çevir.</div>
+      <div class="menu-grid">
+        <div class="menu-stat"><b>Başlangıç Kasa</b><span>220 ₺</span></div>
+        <div class="menu-stat"><b>Başlangıç Şef</b><span>1</span></div>
+        <div class="menu-stat"><b>Hedef</b><span>Yeni Kat</span></div>
+      </div>
+      <div class="menu-actions">
+        <button class="menu-btn play" id="startGameBtn">Oyuna Başla</button>
+        <button class="menu-btn upgrades" id="menuUpgradeBtn">Yükseltmeleri Aç</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab-upgrades" id="toggleUpgradePanel">↑</button>
+
+  <div id="upgradePanel">
+    <div class="up-card">
+      <div class="up-head">
+        <h2 class="up-title">Yükseltmeler</h2>
+        <button class="close-btn" id="closeUpgradePanel">×</button>
+      </div>
+      <div class="up-sub">Bütün ana geliştirmeleri buradan yap. Dükkan büyüdükçe maliyetler artar, ama gelir de hızla yükselir.</div>
+      <div class="up-list">
+        <div class="up-item">
+          <div class="up-item-title">Şef Kirala</div>
+          <div class="up-item-desc">En zayıf dükkana yeni bir çalışan ekler. Daha fazla şef = daha fazla pasif gelir.</div>
+          <button class="up-buy blue" id="panelHireBtn">Satın Al</button>
+        </div>
+        <div class="up-item">
+          <div class="up-item-title">Servis Değeri</div>
+          <div class="up-item-desc">Her servis başına kazanılan parayı yükseltir. Uzun oyunda en güçlü geliştirmelerden biri.</div>
+          <button class="up-buy orange" id="panelUpgradeBtn">Yükselt</button>
+        </div>
+        <div class="up-item">
+          <div class="up-item-title">Şef Hızı</div>
+          <div class="up-item-desc">Şeflerin çalışma süresini azaltır. Aynı sürede daha çok üretim yaparlar.</div>
+          <button class="up-buy" id="panelSpeedBtn">Hızlandır</button>
+        </div>
+        <div class="up-item">
+          <div class="up-item-title">Yeni Alan Aç</div>
+          <div class="up-item-desc">Boş arsayı markete çevirir. Harita genişler, yeni müşteri hedefleri açılır.</div>
+          <button class="up-buy" id="panelExpandBtn">Alan Aç</button>
+        </div>
+        <div class="up-item">
+          <div class="up-item-title">Yeni Kat</div>
+          <div class="up-item-desc">Bütün açık marketleri bir üst kata geçirir. Gelir çarpanı ciddi artar.</div>
+          <button class="up-buy blue" id="panelFloorBtn">Kat Aç</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const mainMenu = document.getElementById('mainMenu');
+    const upgradePanel = document.getElementById('upgradePanel');
+    const toggleUpgradePanel = document.getElementById('toggleUpgradePanel');
+
+    document.getElementById('startGameBtn').addEventListener('click', ()=>{
+      mainMenu.style.display = 'none';
+      showHint('Oyun başladı');
+    });
+
+    function openUpgradePanel(){ upgradePanel.classList.add('open'); }
+    function closeUpgradePanel(){ upgradePanel.classList.remove('open'); }
+    function togglePanel(){ upgradePanel.classList.toggle('open'); }
+
+    document.getElementById('menuUpgradeBtn').addEventListener('click', ()=>{
+      mainMenu.style.display = 'none';
+      openUpgradePanel();
+    });
+    toggleUpgradePanel.addEventListener('click', togglePanel);
+    document.getElementById('closeUpgradePanel').addEventListener('click', closeUpgradePanel);
+
+    document.getElementById('panelHireBtn').addEventListener('click', hireChef);
+    document.getElementById('panelUpgradeBtn').addEventListener('click', upgradeServiceValue);
+    document.getElementById('panelSpeedBtn').addEventListener('click', upgradeChefSpeed);
+    document.getElementById('panelExpandBtn').addEventListener('click', expandBusiness);
+    document.getElementById('panelFloorBtn').addEventListener('click', openNewFloor);
+  </script>
 </body>
 </html>
