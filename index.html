@@ -3,432 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Idle Sushi Tycoon 3D</title>
-
+  <title>Idle Sushi Tycoon - Open Top</title>
   <style>
     :root{
-      --panel:#0f1a2a;
+      --panel:#101928;
       --panel2:#1a2a40;
       --text:#f4fbff;
       --muted:rgba(255,255,255,.74);
-      --green:#25b53f;
-      --green2:#15852c;
-      --blue:#2d78ff;
-      --blue2:#1d57c6;
+      --green:#22b53a;
+      --green2:#14862b;
+      --blue:#2d79ff;
+      --blue2:#1d58c6;
       --orange:#ff9a38;
-      --orange2:#de6d13;
+      --orange2:#df6d13;
       --gold:#ffd45f;
       --shadow:0 18px 40px rgba(0,0,0,.28);
     }
-
     *{box-sizing:border-box}
-    html,body{
-      margin:0;
-      height:100%;
-      overflow:hidden;
-      font-family:Inter,Arial,sans-serif;
-      background:#9ed8ff;
-      color:var(--text);
-    }
-    body{
-      touch-action:none;
-      user-select:none;
-      -webkit-user-select:none;
-    }
-
-    #app{
-      position:fixed;
-      inset:0;
-    }
-
-    #uiTop{
-      position:fixed;
-      left:12px;
-      right:12px;
-      top:12px;
-      display:flex;
-      gap:10px;
-      z-index:20;
-      pointer-events:none;
-    }
-
-    .card{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-      background:linear-gradient(180deg,var(--panel2),var(--panel));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:22px;
-      padding:14px 16px;
-      box-shadow:var(--shadow);
-      pointer-events:auto;
-    }
-
-    .money{flex:1.5}
-    .stat{flex:1}
-
-    .icon{
-      width:46px;
-      height:46px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(180deg,#ffec98,var(--gold));
-      color:#694100;
-      font-weight:1000;
-      font-size:22px;
-      flex:0 0 auto;
-    }
-
-    .label{font-size:12px;opacity:.72}
-    .value{
-      font-size:24px;
-      font-weight:1000;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .sub{font-size:13px;opacity:.84}
-
-    #dragHint{
-      position:fixed;
-      right:12px;
-      top:92px;
-      z-index:19;
-      background:rgba(31,42,57,.82);
-      padding:12px 14px;
-      border-radius:16px;
-      font-size:12px;
-      font-weight:1000;
-      box-shadow:var(--shadow);
-    }
-
-    #menu{
-      position:fixed;
-      inset:0;
-      z-index:40;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:linear-gradient(180deg,rgba(7,12,20,.84),rgba(7,12,20,.92));
-      backdrop-filter:blur(8px);
-    }
-
-    .menuBox{
-      width:min(560px,calc(100% - 24px));
-      background:linear-gradient(180deg,var(--panel2),var(--panel));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:28px;
-      padding:24px;
-      box-shadow:0 25px 60px rgba(0,0,0,.35);
-    }
-
-    .menuTitle{
-      margin:0 0 8px;
-      font-size:38px;
-      font-weight:1000;
-    }
-
-    .menuText{
-      color:var(--muted);
-      line-height:1.5;
-      margin-bottom:16px;
-    }
-
-    .menuGrid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-      margin-bottom:16px;
-    }
-
-    .menuStat{
-      background:rgba(255,255,255,.06);
-      border-radius:18px;
-      padding:14px;
-    }
-
-    .menuStat b{
-      display:block;
-      font-size:12px;
-      opacity:.72;
-      margin-bottom:6px;
-    }
-
-    .menuStat span{
-      font-size:22px;
-      font-weight:1000;
-    }
-
-    .menuActions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    .btn{
-      border:none;
-      border-radius:18px;
-      padding:16px 14px;
-      font-size:17px;
-      font-weight:1000;
-      color:#fff;
-      cursor:pointer;
-      box-shadow:var(--shadow), inset 0 3px 0 rgba(255,255,255,.18);
-    }
-
-    .play{background:linear-gradient(180deg,var(--green),var(--green2))}
-    .upgrades{background:linear-gradient(180deg,var(--blue),var(--blue2))}
-
-    #fab{
-      position:fixed;
-      right:16px;
-      bottom:16px;
-      width:68px;
-      height:68px;
-      border:none;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(180deg,var(--green),var(--green2));
-      color:#fff;
-      font-size:30px;
-      font-weight:1000;
-      box-shadow:var(--shadow);
-      cursor:pointer;
-      z-index:20;
-    }
-
-    #panel{
-      position:fixed;
-      right:12px;
-      top:88px;
-      bottom:96px;
-      width:min(390px,calc(100% - 24px));
-      z-index:30;
-      transform:translateX(calc(100% + 24px));
-      transition:transform .25s ease;
-      pointer-events:none;
-    }
-
-    #panel.open{
-      transform:translateX(0);
-      pointer-events:auto;
-    }
-
-    .panelCard{
-      height:100%;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      background:linear-gradient(180deg,var(--panel2),var(--panel));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:26px;
-      padding:16px;
-      box-shadow:var(--shadow);
-    }
-
-    .panelHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-    }
-
-    .panelHead h2{
-      margin:0;
-      font-size:26px;
-    }
-
-    .close{
-      width:44px;
-      height:44px;
-      border:none;
-      border-radius:14px;
-      background:linear-gradient(180deg,#344255,#202c39);
-      color:#fff;
-      font-size:22px;
-      font-weight:1000;
-      cursor:pointer;
-    }
-
-    .panelSub{
-      font-size:14px;
-      line-height:1.45;
-      opacity:.78;
-    }
-
-    .list{
-      display:grid;
-      gap:10px;
-      overflow:auto;
-      padding-right:4px;
-    }
-
-    .upgradeItem{
-      background:rgba(255,255,255,.05);
-      padding:14px;
-      border-radius:18px;
-    }
-
-    .upgradeItem h3{
-      margin:0 0 6px;
-      font-size:17px;
-    }
-
-    .upgradeItem p{
-      margin:0 0 10px;
-      font-size:13px;
-      line-height:1.35;
-      opacity:.76;
-    }
-
-    .buy{
-      width:100%;
-      border:none;
-      border-radius:14px;
-      padding:12px 10px;
-      color:#fff;
-      font-size:15px;
-      font-weight:1000;
-      cursor:pointer;
-    }
-
-    .buy.green{background:linear-gradient(180deg,var(--green),var(--green2))}
-    .buy.blue{background:linear-gradient(180deg,var(--blue),var(--blue2))}
-    .buy.orange{background:linear-gradient(180deg,var(--orange),var(--orange2))}
-
-    #hint{
-      position:fixed;
-      left:50%;
-      top:86px;
-      transform:translateX(-50%);
-      background:rgba(15,26,42,.9);
-      padding:10px 14px;
-      border-radius:14px;
-      box-shadow:var(--shadow);
-      z-index:25;
-      font-size:14px;
-      font-weight:1000;
-      opacity:0;
-      transition:.22s ease;
-      pointer-events:none;
-    }
-
-    #hint.show{
-      opacity:1;
-      top:98px;
-    }
-
-    @media (max-width:780px){
-      .menuTitle{font-size:32px}
-      .menuGrid{grid-template-columns:1fr}
-      .menuActions{grid-template-columns:1fr}
-      .value{font-size:20px}
-      .icon{width:40px;height:40px;font-size:19px}
-      #panel{top:82px;bottom:92px}
-    }
+    html,body{margin:0;height:100%;overflow:hidden;font-family:Inter,Arial,sans-serif;background:#a7dbff;color:var(--text)}
+    body{touch-action:none;user-select:none;-webkit-user-select:none}
+    #app{position:fixed;inset:0}
+    #uiTop{position:fixed;left:12px;right:12px;top:12px;display:flex;gap:10px;z-index:20;pointer-events:none}
+    .card{display:flex;align-items:center;gap:12px;min-width:0;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow);pointer-events:auto}
+    .money{flex:1.5}.stat{flex:1}
+    .icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(180deg,#ffec98,var(--gold));color:#694100;font-weight:1000;font-size:22px;flex:0 0 auto}
+    .label{font-size:12px;opacity:.72}.value{font-size:24px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:13px;opacity:.84}
+    #dragHint{position:fixed;right:12px;top:92px;z-index:19;background:rgba(31,42,57,.82);padding:12px 14px;border-radius:16px;font-size:12px;font-weight:1000;box-shadow:var(--shadow)}
+    #menu{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(7,12,20,.84),rgba(7,12,20,.92));backdrop-filter:blur(8px)}
+    .menuBox{width:min(560px,calc(100% - 24px));background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+    .menuTitle{margin:0 0 8px;font-size:38px;font-weight:1000}.menuText{color:var(--muted);line-height:1.5;margin-bottom:16px}.menuGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.menuStat{background:rgba(255,255,255,.06);border-radius:18px;padding:14px}.menuStat b{display:block;font-size:12px;opacity:.72;margin-bottom:6px}.menuStat span{font-size:22px;font-weight:1000}.menuActions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .btn{border:none;border-radius:18px;padding:16px 14px;font-size:17px;font-weight:1000;color:#fff;cursor:pointer;box-shadow:var(--shadow), inset 0 3px 0 rgba(255,255,255,.18)}
+    .play{background:linear-gradient(180deg,var(--green),var(--green2))}.upgrades{background:linear-gradient(180deg,var(--blue),var(--blue2))}
+    #fab{position:fixed;right:16px;bottom:16px;width:68px;height:68px;border:none;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,var(--green),var(--green2));color:#fff;font-size:30px;font-weight:1000;box-shadow:var(--shadow);cursor:pointer;z-index:20}
+    #panel{position:fixed;right:12px;top:88px;bottom:96px;width:min(390px,calc(100% - 24px));z-index:30;transform:translateX(calc(100% + 24px));transition:transform .25s ease;pointer-events:none}
+    #panel.open{transform:translateX(0);pointer-events:auto}
+    .panelCard{height:100%;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid rgba(255,255,255,.08);border-radius:26px;padding:16px;box-shadow:var(--shadow)}
+    .panelHead{display:flex;align-items:center;justify-content:space-between}.panelHead h2{margin:0;font-size:26px}.close{width:44px;height:44px;border:none;border-radius:14px;background:linear-gradient(180deg,#344255,#202c39);color:#fff;font-size:22px;font-weight:1000;cursor:pointer}.panelSub{font-size:14px;line-height:1.45;opacity:.78}.list{display:grid;gap:10px;overflow:auto;padding-right:4px}.upgradeItem{background:rgba(255,255,255,.05);padding:14px;border-radius:18px}.upgradeItem h3{margin:0 0 6px;font-size:17px}.upgradeItem p{margin:0 0 10px;font-size:13px;line-height:1.35;opacity:.76}.buy{width:100%;border:none;border-radius:14px;padding:12px 10px;color:#fff;font-size:15px;font-weight:1000;cursor:pointer}.buy.green{background:linear-gradient(180deg,var(--green),var(--green2))}.buy.blue{background:linear-gradient(180deg,var(--blue),var(--blue2))}.buy.orange{background:linear-gradient(180deg,var(--orange),var(--orange2))}
+    #hint{position:fixed;left:50%;top:86px;transform:translateX(-50%);background:rgba(15,26,42,.9);padding:10px 14px;border-radius:14px;box-shadow:var(--shadow);z-index:25;font-size:14px;font-weight:1000;opacity:0;transition:.22s ease;pointer-events:none}#hint.show{opacity:1;top:98px}
+    @media (max-width:780px){.menuTitle{font-size:32px}.menuGrid{grid-template-columns:1fr}.menuActions{grid-template-columns:1fr}.value{font-size:20px}.icon{width:40px;height:40px;font-size:19px}#panel{top:82px;bottom:92px}}
   </style>
-
   <script async src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"></script>
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-    }
-  }
-  </script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 </head>
 <body>
   <div id="app"></div>
-
   <div id="uiTop">
-    <div class="card money">
-      <div class="icon">₺</div>
-      <div style="min-width:0">
-        <div class="label">Kasa</div>
-        <div class="value" id="moneyText">300 ₺</div>
-        <div class="sub" id="incomeText">Gelir: 0/sn</div>
-      </div>
-    </div>
-    <div class="card stat">
-      <div class="icon">👥</div>
-      <div style="min-width:0">
-        <div class="label">Müşteri</div>
-        <div class="value" id="customerText">0</div>
-      </div>
-    </div>
-    <div class="card stat">
-      <div class="icon">🏢</div>
-      <div style="min-width:0">
-        <div class="label">Kat</div>
-        <div class="value" id="floorText">1</div>
-      </div>
-    </div>
+    <div class="card money"><div class="icon">₺</div><div style="min-width:0"><div class="label">Kasa</div><div class="value" id="moneyText">300 ₺</div><div class="sub" id="incomeText">Gelir: 0/sn</div></div></div>
+    <div class="card stat"><div class="icon">👥</div><div style="min-width:0"><div class="label">Müşteri</div><div class="value" id="customerText">0</div></div></div>
+    <div class="card stat"><div class="icon">🍣</div><div style="min-width:0"><div class="label">Seviye</div><div class="value" id="floorText">1</div></div></div>
   </div>
-
-  <div id="dragHint">Sürükle: kamerayı sağa sola kaydır</div>
+  <div id="dragHint">Sürükle: sahneyi sağa sola kaydır</div>
   <div id="hint"></div>
-
-  <div id="menu">
-    <div class="menuBox">
-      <h1 class="menuTitle">Idle Sushi Tycoon</h1>
-      <div class="menuText">
-        Three.js ile yapılmış 3D sushi tycoon demosu. Sushi barlar görünür, müşteriler yürür,
-        para pasif akar, yeni alan açılır.
-      </div>
-      <div class="menuGrid">
-        <div class="menuStat"><b>Başlangıç Kasa</b><span>300 ₺</span></div>
-        <div class="menuStat"><b>Başlangıç Şefi</b><span>1</span></div>
-        <div class="menuStat"><b>Hedef</b><span>2. Alan</span></div>
-      </div>
-      <div class="menuActions">
-        <button class="btn play" id="startBtn">Oyna</button>
-        <button class="btn upgrades" id="menuUpgradesBtn">Yükseltmeler</button>
-      </div>
-    </div>
-  </div>
-
+  <div id="menu"><div class="menuBox"><h1 class="menuTitle">Idle Sushi Tycoon</h1><div class="menuText">Tek bina, üstü açık sushi restoranı. Çalışanlar içeride görünür, müşteriler sıraya girer, para pasif akar. Referanstaki oyundan ilhamlı ama sushi temalı ve özgün.</div><div class="menuGrid"><div class="menuStat"><b>Başlangıç Kasa</b><span>300 ₺</span></div><div class="menuStat"><b>Başlangıç Şefi</b><span>1</span></div><div class="menuStat"><b>Tarz</b><span>Açık Üst</span></div></div><div class="menuActions"><button class="btn play" id="startBtn">Oyna</button><button class="btn upgrades" id="menuUpgradesBtn">Yükseltmeler</button></div></div></div>
   <button id="fab">↑</button>
-
-  <div id="panel">
-    <div class="panelCard">
-      <div class="panelHead">
-        <h2>Yükseltmeler</h2>
-        <button class="close" id="closeBtn">×</button>
-      </div>
-      <div class="panelSub">
-        Tüm geliştirmeler burada. Alt ekran kapanmaz, sahne görünür kalır.
-      </div>
-      <div class="list">
-        <div class="upgradeItem">
-          <h3>Sushi Şefi Kirala</h3>
-          <p>En zayıf bara yeni şef ekler.</p>
-          <button class="buy blue" id="hireBtn"></button>
-        </div>
-        <div class="upgradeItem">
-          <h3>Sushi Değeri +</h3>
-          <p>Her satıştan gelen parayı artırır.</p>
-          <button class="buy orange" id="valueBtn"></button>
-        </div>
-        <div class="upgradeItem">
-          <h3>Şef Hızı +</h3>
-          <p>Şeflerin servis süresini düşürür.</p>
-          <button class="buy green" id="speedBtn"></button>
-        </div>
-        <div class="upgradeItem">
-          <h3>Yeni Alan Aç</h3>
-          <p>Boş arsayı yeni sushi bara çevirir.</p>
-          <button class="buy green" id="expandBtn"></button>
-        </div>
-        <div class="upgradeItem">
-          <h3>Yeni Kat Aç</h3>
-          <p>Tüm barların gelirini yükseltir.</p>
-          <button class="buy blue" id="floorBtn"></button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="panel"><div class="panelCard"><div class="panelHead"><h2>Yükseltmeler</h2><button class="close" id="closeBtn">×</button></div><div class="panelSub">Tek binayı büyüt, şef kirala, sushi değerini artır. İleride yeni bölümler açılır.</div><div class="list"><div class="upgradeItem"><h3>Sushi Şefi Kirala</h3><p>Tezgaha yeni çalışan ekler.</p><button class="buy blue" id="hireBtn"></button></div><div class="upgradeItem"><h3>Sushi Değeri +</h3><p>Her satıştan gelen parayı artırır.</p><button class="buy orange" id="valueBtn"></button></div><div class="upgradeItem"><h3>Şef Hızı +</h3><p>Şeflerin hazırlama süresini düşürür.</p><button class="buy green" id="speedBtn"></button></div><div class="upgradeItem"><h3>Sol Bölüm Aç</h3><p>Restoranı büyütür, daha çok müşteri çeker.</p><button class="buy green" id="expandBtn"></button></div><div class="upgradeItem"><h3>Prestij / Seviye</h3><p>Gelir çarpanı artar.</p><button class="buy blue" id="floorBtn"></button></div></div></div></div>
 
   <script type="module">
     import * as THREE from 'three';
@@ -437,12 +65,10 @@
     const hintEl = document.getElementById('hint');
     const panelEl = document.getElementById('panel');
     const menuEl = document.getElementById('menu');
-
     const moneyText = document.getElementById('moneyText');
     const incomeText = document.getElementById('incomeText');
     const customerText = document.getElementById('customerText');
     const floorText = document.getElementById('floorText');
-
     const hireBtn = document.getElementById('hireBtn');
     const valueBtn = document.getElementById('valueBtn');
     const speedBtn = document.getElementById('speedBtn');
@@ -452,25 +78,24 @@
     const state = {
       money: 300,
       customersServed: 0,
-      floor: 1,
-
-      hireCost: 150,
-      valueCost: 250,
+      level: 1,
+      hireCost: 140,
+      valueCost: 220,
       speedCost: 180,
-      expandCost: 420,
-      floorCost: 2600,
-
-      globalValueLevel: 0,
-      globalSpeedLevel: 0,
-
-      lots: [],
-      customers: [],
-
+      expandCost: 480,
+      levelCost: 2600,
+      valueLevel: 0,
+      speedLevel: 0,
+      widthLevel: 1,
+      chefs: 1,
+      income: 2,
+      speed: 1.2,
+      progress: 0,
+      queue: [],
       customerSpawnTimer: 0,
       dragging: false,
       prevX: 0,
       camTargetX: 0,
-
       lastTime: performance.now(),
     };
 
@@ -480,681 +105,249 @@
       if (n >= 1e3) return (n / 1e3).toFixed(n >= 1e4 ? 0 : 1) + ' K';
       return Math.floor(n).toString();
     }
-
-    function clamp(v,min,max){
-      return Math.max(min, Math.min(max, v));
-    }
-
-    function rand(min,max){
-      return Math.random() * (max - min) + min;
-    }
-
-    function randi(min,max){
-      return Math.floor(rand(min, max + 1));
-    }
-
-    function showHint(text){
-      hintEl.textContent = text;
-      hintEl.classList.add('show');
-      clearTimeout(showHint._t);
-      showHint._t = setTimeout(() => hintEl.classList.remove('show'), 1400);
-    }
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    function randi(min,max){ return Math.floor(rand(min,max+1)); }
+    function showHint(text){ hintEl.textContent = text; hintEl.classList.add('show'); clearTimeout(showHint._t); showHint._t = setTimeout(()=>hintEl.classList.remove('show'),1400); }
 
     const renderer = new THREE.WebGLRenderer({ antialias:true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     app.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xaedfff);
-    scene.fog = new THREE.Fog(0xaedfff, 55, 120);
+    scene.background = new THREE.Color(0xaee0ff);
+    scene.fog = new THREE.Fog(0xaee0ff, 45, 95);
 
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 300);
-    camera.position.set(0, 18, 24);
+    const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 300);
+    camera.position.set(0, 16, 20);
     camera.lookAt(0, 0, 0);
 
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x7cb16b, 1.15);
-    scene.add(hemi);
-
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x7ab066, 1.1));
     const sun = new THREE.DirectionalLight(0xffffff, 1.15);
-    sun.position.set(18, 28, 16);
+    sun.position.set(16, 26, 14);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.left = -40;
-    sun.shadow.camera.right = 40;
-    sun.shadow.camera.top = 40;
-    sun.shadow.camera.bottom = -40;
+    sun.shadow.camera.left = -40; sun.shadow.camera.right = 40; sun.shadow.camera.top = 40; sun.shadow.camera.bottom = -40;
     scene.add(sun);
 
-    const ground = new THREE.Mesh(
-      new THREE.BoxGeometry(220, 1, 60),
-      new THREE.MeshStandardMaterial({ color:0x7fcb6b })
-    );
-    ground.position.set(35, -0.5, 0);
-    ground.receiveShadow = true;
-    scene.add(ground);
-
-    const road = new THREE.Mesh(
-      new THREE.BoxGeometry(220, 0.1, 10),
-      new THREE.MeshStandardMaterial({ color:0x626b7a })
-    );
-    road.position.set(35, 0.02, -12);
-    road.receiveShadow = true;
-    scene.add(road);
-
-    const sidewalk = new THREE.Mesh(
-      new THREE.BoxGeometry(220, 0.12, 3),
-      new THREE.MeshStandardMaterial({ color:0xe8edf4 })
-    );
-    sidewalk.position.set(35, 0.08, -5.6);
-    sidewalk.receiveShadow = true;
-    scene.add(sidewalk);
-
-    for(let i = -20; i < 120; i += 4){
-      const line = new THREE.Mesh(
-        new THREE.BoxGeometry(1.8, 0.12, 0.25),
-        new THREE.MeshStandardMaterial({
-          color:0xf2e08f,
-          emissive:0x5d551b,
-          emissiveIntensity:.2
-        })
-      );
-      line.position.set(i, 0.09, -12);
-      scene.add(line);
-    }
-
-    function mat(color, roughness=.72, metalness=.08){
-      return new THREE.MeshStandardMaterial({ color, roughness, metalness });
-    }
-
-    const materials = {
-      base: mat(0xd6e0ea),
-      wall: mat(0xf6fbff),
-      side: mat(0xc7d7e3),
-      roof: mat(0xef7c49),
-      wood: mat(0xb77b47),
-      glass: new THREE.MeshStandardMaterial({
-        color:0x7fd7ff,
-        roughness:.12,
-        metalness:.1,
-        transparent:true,
-        opacity:.9
-      }),
-      sign: mat(0xe85a2b, .4, .08),
-      rice: mat(0xf8f3eb),
-      personSkin: mat(0xffd8c2),
-      chefBody: mat(0xdaf0ff),
-      dark: mat(0x24303e),
-      green: new THREE.MeshStandardMaterial({
-        color:0x22b53a,
-        emissive:0x0f4d18,
-        emissiveIntensity:.22
-      }),
-      gold: new THREE.MeshStandardMaterial({
-        color:0xffd45f,
-        emissive:0x6e580e,
-        emissiveIntensity:.14
-      }),
+    function mat(color, rough=.72, metal=.08){ return new THREE.MeshStandardMaterial({ color, roughness:rough, metalness:metal }); }
+    const mats = {
+      grass: mat(0x82cb6d), road: mat(0x636d7b), sidewalk: mat(0xe9edf4),
+      floor: mat(0xdbd0c2), wall: mat(0xf6fbff), accent: mat(0xef7b48),
+      glass: new THREE.MeshStandardMaterial({ color:0x83d9ff, roughness:.1, metalness:.08, transparent:true, opacity:.88 }),
+      wood: mat(0xb67a46), dark: mat(0x22303d), rice: mat(0xf8f3eb),
+      salmon: mat(0xf58d62), tuna: mat(0xd84c5b), skin: mat(0xffd8c2),
+      chef: mat(0xdaf0ff), green: new THREE.MeshStandardMaterial({ color:0x22b53a, emissive:0x11481b, emissiveIntensity:.25 }),
+      gold: new THREE.MeshStandardMaterial({ color:0xffd45f, emissive:0x6b560f, emissiveIntensity:.16 }),
+      table: mat(0x9e6a3f)
     };
 
-    const lotGroup = new THREE.Group();
-    scene.add(lotGroup);
+    const ground = new THREE.Mesh(new THREE.BoxGeometry(120, 1, 60), mats.grass);
+    ground.position.set(0, -0.5, 0); ground.receiveShadow = true; scene.add(ground);
+    const road = new THREE.Mesh(new THREE.BoxGeometry(120, .12, 10), mats.road);
+    road.position.set(0, .02, -12); road.receiveShadow = true; scene.add(road);
+    const sidewalk = new THREE.Mesh(new THREE.BoxGeometry(120, .12, 3), mats.sidewalk);
+    sidewalk.position.set(0, .08, -5.6); sidewalk.receiveShadow = true; scene.add(sidewalk);
+    for(let i=-50;i<50;i+=4){ const line = new THREE.Mesh(new THREE.BoxGeometry(1.8,.12,.25), new THREE.MeshStandardMaterial({ color:0xf2e08f })); line.position.set(i,.09,-12); scene.add(line); }
 
-    const customerGroup = new THREE.Group();
-    scene.add(customerGroup);
-
-    function makeSushiPiece(x,y,z,color){
-      const g = new THREE.Group();
-
-      const rice = new THREE.Mesh(
-        new THREE.BoxGeometry(.5,.18,.32),
-        materials.rice
-      );
-
-      const fish = new THREE.Mesh(
-        new THREE.BoxGeometry(.46,.12,.28),
-        new THREE.MeshStandardMaterial({ color })
-      );
-      fish.position.y = .12;
-
-      g.add(rice, fish);
-      g.position.set(x,y,z);
-
-      rice.castShadow = true;
-      fish.castShadow = true;
-
-      return g;
-    }
+    const world = new THREE.Group(); scene.add(world);
+    const customersGroup = new THREE.Group(); world.add(customersGroup);
 
     function makeChef(){
       const g = new THREE.Group();
-
-      const body = new THREE.Mesh(new THREE.BoxGeometry(.42,.5,.28), materials.chefBody);
-      body.position.y = .5;
-
-      const head = new THREE.Mesh(new THREE.SphereGeometry(.17, 16, 16), materials.personSkin);
-      head.position.y = .9;
-
-      const hat = new THREE.Mesh(
-        new THREE.CylinderGeometry(.18,.22,.16,18),
-        new THREE.MeshStandardMaterial({ color:0xffffff })
-      );
-      hat.position.y = 1.1;
-
-      const leg1 = new THREE.Mesh(new THREE.BoxGeometry(.08,.3,.08), materials.dark);
-      const leg2 = leg1.clone();
-      leg1.position.set(-.08,.15,0);
-      leg2.position.set(.08,.15,0);
-
-      g.add(body, head, hat, leg1, leg2);
-      g.userData = { leg1, leg2 };
-
-      g.traverse(obj => {
-        if (obj.isMesh) obj.castShadow = true;
-      });
-
-      return g;
+      const body = new THREE.Mesh(new THREE.BoxGeometry(.42,.5,.28), mats.chef); body.position.y=.5;
+      const head = new THREE.Mesh(new THREE.SphereGeometry(.17,16,16), mats.skin); head.position.y=.9;
+      const hat = new THREE.Mesh(new THREE.CylinderGeometry(.18,.22,.16,18), new THREE.MeshStandardMaterial({ color:0xffffff })); hat.position.y=1.1;
+      const leg1 = new THREE.Mesh(new THREE.BoxGeometry(.08,.3,.08), mats.dark); leg1.position.set(-.08,.15,0);
+      const leg2 = leg1.clone(); leg2.position.set(.08,.15,0);
+      g.add(body,head,hat,leg1,leg2); g.userData={leg1,leg2}; g.traverse(o=>o.isMesh&&(o.castShadow=true)); return g;
     }
 
     function makeCustomer(color){
       const g = new THREE.Group();
-
-      const body = new THREE.Mesh(
-        new THREE.BoxGeometry(.4,.5,.26),
-        new THREE.MeshStandardMaterial({ color })
-      );
-      body.position.y = .48;
-
-      const head = new THREE.Mesh(
-        new THREE.SphereGeometry(.16, 14, 14),
-        materials.personSkin
-      );
-      head.position.y = .88;
-
-      const hair = new THREE.Mesh(
-        new THREE.BoxGeometry(.24,.1,.18),
-        mat(0x4a3325)
-      );
-      hair.position.set(0,.96,0);
-
-      const leg1 = new THREE.Mesh(new THREE.BoxGeometry(.08,.28,.08), materials.dark);
-      const leg2 = leg1.clone();
-      leg1.position.set(-.08,.14,0);
-      leg2.position.set(.08,.14,0);
-
-      g.add(body, head, hair, leg1, leg2);
-      g.userData = { leg1, leg2 };
-
-      g.traverse(obj => {
-        if (obj.isMesh) obj.castShadow = true;
-      });
-
-      return g;
+      const body = new THREE.Mesh(new THREE.BoxGeometry(.4,.5,.26), new THREE.MeshStandardMaterial({ color })); body.position.y=.48;
+      const head = new THREE.Mesh(new THREE.SphereGeometry(.16,14,14), mats.skin); head.position.y=.88;
+      const hair = new THREE.Mesh(new THREE.BoxGeometry(.24,.1,.18), mat(0x4a3325)); hair.position.set(0,.96,0);
+      const leg1 = new THREE.Mesh(new THREE.BoxGeometry(.08,.28,.08), mats.dark); leg1.position.set(-.08,.14,0);
+      const leg2 = leg1.clone(); leg2.position.set(.08,.14,0);
+      g.add(body,head,hair,leg1,leg2); g.userData={leg1,leg2}; g.traverse(o=>o.isMesh&&(o.castShadow=true)); return g;
     }
 
-    function refreshLotVisual(lot){
-      const active = lot.purchased;
-      for (const obj of lot.activeObjects){
-        obj.visible = active;
-      }
-      lot.buyPad.visible = !active;
-      lot.coin.visible = !active;
-    }
-
-    function rebuildChefs(lot){
-      for (const chef of lot.chefMeshes){
-        lot.mesh.remove(chef);
-      }
-      lot.chefMeshes = [];
-
-      const shown = Math.min(lot.chefs, 5);
-      for(let i=0;i<shown;i++){
-        const chef = makeChef();
-        chef.position.set(-1 + i * .5, .25, -.2 + (i % 2) * .25);
-        lot.mesh.add(chef);
-        lot.chefMeshes.push(chef);
-      }
-    }
-
-    function createBarMesh(lot){
+    function sushiPiece(x,z,color){
       const g = new THREE.Group();
-      g.position.set(lot.x, 0, 0);
+      const rice = new THREE.Mesh(new THREE.BoxGeometry(.45,.14,.28), mats.rice);
+      const fish = new THREE.Mesh(new THREE.BoxGeometry(.42,.08,.24), color==='salmon'?mats.salmon:mats.tuna); fish.position.y=.09;
+      g.add(rice,fish); g.position.set(x,1.06,z); g.traverse(o=>o.isMesh&&(o.castShadow=true)); return g;
+    }
 
-      const base = new THREE.Mesh(new THREE.BoxGeometry(6.6,.5,4.2), materials.base);
-      base.position.y = .25;
-      base.receiveShadow = true;
+    const restaurant = new THREE.Group();
+    world.add(restaurant);
 
-      const building = new THREE.Mesh(new THREE.BoxGeometry(4.9,2.4,3.1), materials.wall);
-      building.position.set(0,1.45,0);
+    let leftExpansion = null;
+    const chefMeshes = [];
+    const queueTargets = [];
 
-      const roof = new THREE.Mesh(new THREE.BoxGeometry(5.3,.4,3.5), materials.roof);
-      roof.position.set(0,2.86,0);
+    function buildRestaurant(){
+      restaurant.clear();
+      chefMeshes.length = 0;
+      queueTargets.length = 0;
 
-      const sign = new THREE.Mesh(new THREE.BoxGeometry(3.4,.42,.22), materials.sign);
-      sign.position.set(0,2.15,1.67);
+      const baseWidth = 8 + (state.widthLevel - 1) * 3;
+      const floor = new THREE.Mesh(new THREE.BoxGeometry(baseWidth,.3,6), mats.floor);
+      floor.position.set(0,.15,0); floor.receiveShadow = true; restaurant.add(floor);
 
-      const glass1 = new THREE.Mesh(new THREE.BoxGeometry(1,.72,.08), materials.glass);
-      const glass2 = glass1.clone();
-      const glass3 = glass1.clone();
-      glass1.position.set(-1.28,1.45,1.56);
-      glass2.position.set(0,1.45,1.56);
-      glass3.position.set(1.28,1.45,1.56);
+      const backWall = new THREE.Mesh(new THREE.BoxGeometry(baseWidth,2.4,.25), mats.wall);
+      backWall.position.set(0,1.35,-2.85); restaurant.add(backWall);
 
-      const door = new THREE.Mesh(new THREE.BoxGeometry(.65,1.1,.1), materials.wood);
-      door.position.set(0,.8,1.57);
+      const leftWall = new THREE.Mesh(new THREE.BoxGeometry(.25,2.2,5.2), mats.wall);
+      leftWall.position.set(-baseWidth/2 + .12,1.2,-.1); restaurant.add(leftWall);
 
-      const counter = new THREE.Mesh(new THREE.BoxGeometry(2.6,.36,.8), materials.wood);
-      counter.position.set(0,.9,.2);
+      const rightWall = leftWall.clone(); rightWall.position.x = baseWidth/2 - .12; restaurant.add(rightWall);
 
-      const shelves = [];
-      for(let i=0;i<5;i++){
-        const shelf = new THREE.Mesh(new THREE.BoxGeometry(.8,.18,.48), materials.side);
-        shelf.position.set(-1.8 + i * .9, .58, -.8);
-        shelves.push(shelf);
+      const accent = new THREE.Mesh(new THREE.BoxGeometry(baseWidth+.1,.35,.3), mats.accent);
+      accent.position.set(0,2.55,-2.8); restaurant.add(accent);
+
+      const frontCounter = new THREE.Mesh(new THREE.BoxGeometry(baseWidth-1.2,.65,.85), mats.table);
+      frontCounter.position.set(0,.48,1.15); restaurant.add(frontCounter);
+
+      const prepCounter = new THREE.Mesh(new THREE.BoxGeometry(baseWidth-1.7,.45,.8), mats.wood);
+      prepCounter.position.set(0,.82,-.2); restaurant.add(prepCounter);
+
+      for(let i=0;i<Math.max(5, Math.floor(baseWidth));i++){
+        const shelf = new THREE.Mesh(new THREE.BoxGeometry(.7,.18,.35), mats.dark);
+        shelf.position.set(-baseWidth/2 + 1 + i*.9,.65,-1.55); restaurant.add(shelf);
       }
 
-      const sushiSet = new THREE.Group();
-      sushiSet.add(makeSushiPiece(-.9,1.12,.2,0xf48a5d));
-      sushiSet.add(makeSushiPiece(-.35,1.12,.2,0xd84d5a));
-      sushiSet.add(makeSushiPiece(.2,1.12,.2,0xf48a5d));
-      sushiSet.add(makeSushiPiece(.75,1.12,.2,0xd84d5a));
+      for(let i=0;i<6;i++) restaurant.add(sushiPiece(-1.8 + i*.7,.05, i%2===0?'salmon':'tuna'));
 
-      const buyPad = new THREE.Mesh(new THREE.BoxGeometry(2.8,.16,1.8), materials.green);
-      buyPad.position.set(0,.1,-.1);
+      for(let i=0;i<state.chefs;i++){
+        const chef = makeChef();
+        const spacing = Math.min(1.2, (baseWidth-2.8)/Math.max(1,state.chefs-1||1));
+        const startX = -((state.chefs-1)*spacing)/2;
+        chef.position.set(startX + i*spacing,.18,-.15 + (i%2)*.3);
+        chefMeshes.push(chef); restaurant.add(chef);
+      }
 
-      const coin = new THREE.Mesh(
-        new THREE.CylinderGeometry(.42,.42,.12,20),
-        materials.gold
-      );
-      coin.rotation.x = Math.PI / 2;
-      coin.position.set(0,1.25,-.1);
+      const pad = new THREE.Mesh(new THREE.BoxGeometry(2.3,.12,1.5), mats.green);
+      pad.position.set(-baseWidth/2 + 1.6,.08,1.75); restaurant.add(pad);
+      leftExpansion = pad;
 
-      g.add(base, building, roof, sign, glass1, glass2, glass3, door, counter, sushiSet, buyPad, coin, ...shelves);
+      const coin = new THREE.Mesh(new THREE.CylinderGeometry(.36,.36,.12,18), mats.gold);
+      coin.rotation.x = Math.PI/2; coin.position.set(-baseWidth/2 + 1.6,1.1,1.75); restaurant.add(coin);
+      restaurant.userData.coin = coin;
 
-      g.traverse(obj => {
-        if (obj.isMesh) obj.castShadow = true;
-      });
-
-      lot.mesh = g;
-      lot.buyPad = buyPad;
-      lot.coin = coin;
-      lot.activeObjects = [base, building, roof, sign, glass1, glass2, glass3, door, counter, sushiSet, ...shelves];
-      lot.chefMeshes = [];
-
-      rebuildChefs(lot);
-      refreshLotVisual(lot);
-
-      return g;
+      for(let i=0;i<Math.min(5, 2 + state.widthLevel);i++){
+        queueTargets.push(new THREE.Vector3(-baseWidth/2 + 1.2 + i*1.05, .02, 3.15));
+      }
     }
 
-    function createLot(index){
-      return {
-        id: index + 1,
-        x: index * 9,
-        purchased: index === 0,
-        chefs: index === 0 ? 1 : 0,
-        income: index === 0 ? 2 : 1,
-        speed: index === 0 ? 1.15 : 1.2,
-        progress: 0,
-        mesh: null,
-        buyPad: null,
-        coin: null,
-        activeObjects: [],
-        chefMeshes: [],
-      };
-    }
+    buildRestaurant();
 
-    for(let i=0;i<5;i++){
-      const lot = createLot(i);
-      state.lots.push(lot);
-      lotGroup.add(createBarMesh(lot));
-    }
-
-    function purchasedLots(){
-      return state.lots.filter(l => l.purchased);
-    }
-
-    function lotCost(lot){
-      return 360 + (lot.id - 1) * 260 + (lot.id - 1) * (lot.id - 1) * 60;
-    }
-
-    function incomePerSec(){
-      return purchasedLots().reduce((sum, lot) => sum + (lot.chefs * lot.income / lot.speed), 0);
-    }
-
+    function incomePerSec(){ return state.chefs * state.income / state.speed; }
     function updateUI(){
       moneyText.textContent = fmt(state.money) + ' ₺';
       incomeText.textContent = 'Gelir: ' + fmt(incomePerSec()) + '/sn';
       customerText.textContent = state.customersServed;
-      floorText.textContent = state.floor;
-
+      floorText.textContent = state.level;
       hireBtn.textContent = 'Satın Al (' + fmt(state.hireCost) + ' ₺)';
       valueBtn.textContent = 'Yükselt (' + fmt(state.valueCost) + ' ₺)';
       speedBtn.textContent = 'Hızlandır (' + fmt(state.speedCost) + ' ₺)';
-      expandBtn.textContent = 'Alan Aç (' + fmt(state.expandCost) + ' ₺)';
-      floorBtn.textContent = 'Kat Aç (' + fmt(state.floorCost) + ' ₺)';
+      expandBtn.textContent = 'Bölüm Aç (' + fmt(state.expandCost) + ' ₺)';
+      floorBtn.textContent = 'Prestij (' + fmt(state.levelCost) + ' ₺)';
     }
 
-    function buyLot(id){
-      const lot = state.lots.find(l => l.id === id);
-      if (!lot || lot.purchased) return;
-
-      const cost = lotCost(lot);
-      if (state.money < cost){
-        showHint('Yetersiz para');
-        return;
-      }
-
-      state.money -= cost;
-      lot.purchased = true;
-      lot.chefs = 1;
-      lot.income = 1 + state.floor + state.globalValueLevel;
-      lot.speed = Math.max(0.42, 1.18 - state.globalSpeedLevel * 0.07);
-      lot.progress = 0;
-
-      refreshLotVisual(lot);
-      rebuildChefs(lot);
-
-      state.camTargetX = clamp(lot.x, 0, (state.lots.length - 1) * 9);
-
-      updateUI();
-      showHint('Yeni sushi bar açıldı');
-    }
-
-    function hireChef(){
-      const lots = purchasedLots();
-      if (!lots.length) return;
-
-      if (state.money < state.hireCost){
-        showHint('Yetersiz para');
-        return;
-      }
-
-      state.money -= state.hireCost;
-
-      let target = lots[0];
-      for (const lot of lots){
-        if (lot.chefs < target.chefs) target = lot;
-      }
-
-      target.chefs += 1;
-      state.hireCost = Math.floor(state.hireCost * 1.4 + 20);
-
-      rebuildChefs(target);
-      updateUI();
-      showHint('Yeni sushi şefi geldi');
-    }
-
-    function upgradeValue(){
-      const lots = purchasedLots();
-      if (!lots.length) return;
-
-      if (state.money < state.valueCost){
-        showHint('Yetersiz para');
-        return;
-      }
-
-      state.money -= state.valueCost;
-      state.globalValueLevel += 1;
-
-      for (const lot of lots){
-        lot.income = Math.floor(lot.income * 1.45 + 1);
-      }
-
-      state.valueCost = Math.floor(state.valueCost * 1.55 + 35);
-      updateUI();
-      showHint('Sushi değeri arttı');
-    }
-
-    function upgradeSpeed(){
-      const lots = purchasedLots();
-      if (!lots.length) return;
-
-      if (state.money < state.speedCost){
-        showHint('Yetersiz para');
-        return;
-      }
-
-      state.money -= state.speedCost;
-      state.globalSpeedLevel += 1;
-
-      for (const lot of lots){
-        lot.speed = Math.max(0.35, lot.speed * 0.9);
-      }
-
-      state.speedCost = Math.floor(state.speedCost * 1.45 + 28);
-      updateUI();
-      showHint('Şefler hızlandı');
-    }
-
-    function expand(){
-      const nextLot = state.lots.find(l => !l.purchased);
-      if (!nextLot){
-        showHint('Bütün alanlar açık');
-        return;
-      }
-
-      if (state.money < state.expandCost){
-        showHint('Yetersiz para');
-        return;
-      }
-
-      state.money -= state.expandCost;
-
-      nextLot.purchased = true;
-      nextLot.chefs = 1;
-      nextLot.income = 1 + state.floor + state.globalValueLevel;
-      nextLot.speed = Math.max(0.42, 1.18 - state.globalSpeedLevel * 0.07);
-      nextLot.progress = 0;
-
-      state.expandCost = Math.floor(state.expandCost * 1.7 + 90);
-
-      refreshLotVisual(nextLot);
-      rebuildChefs(nextLot);
-
-      state.camTargetX = clamp(nextLot.x, 0, (state.lots.length - 1) * 9);
-
-      updateUI();
-      showHint('Yeni alan açıldı');
-    }
-
-    function openNewFloor(){
-      if (state.money < state.floorCost){
-        showHint('Yetersiz para');
-        return;
-      }
-
-      state.money -= state.floorCost;
-      state.floor += 1;
-
-      for (const lot of purchasedLots()){
-        lot.income = Math.floor(lot.income * 1.8 + state.floor);
-      }
-
-      state.floorCost = Math.floor(state.floorCost * 2.2 + 700);
-      updateUI();
-      showHint('Yeni kat açıldı');
-    }
+    function hireChef(){ if(state.money < state.hireCost){ showHint('Yetersiz para'); return; } state.money -= state.hireCost; state.chefs++; state.hireCost = Math.floor(state.hireCost*1.42 + 18); buildRestaurant(); updateUI(); showHint('Yeni sushi şefi geldi'); }
+    function upgradeValue(){ if(state.money < state.valueCost){ showHint('Yetersiz para'); return; } state.money -= state.valueCost; state.valueLevel++; state.income = Math.floor(state.income*1.45 + 1); state.valueCost = Math.floor(state.valueCost*1.55 + 35); updateUI(); showHint('Sushi değeri arttı'); }
+    function upgradeSpeed(){ if(state.money < state.speedCost){ showHint('Yetersiz para'); return; } state.money -= state.speedCost; state.speedLevel++; state.speed = Math.max(.35, state.speed*.9); state.speedCost = Math.floor(state.speedCost*1.45 + 28); updateUI(); showHint('Şefler hızlandı'); }
+    function expand(){ if(state.money < state.expandCost){ showHint('Yetersiz para'); return; } state.money -= state.expandCost; state.widthLevel++; state.expandCost = Math.floor(state.expandCost*1.8 + 140); buildRestaurant(); updateUI(); showHint('Sushi bar büyüdü'); }
+    function prestige(){ if(state.money < state.levelCost){ showHint('Yetersiz para'); return; } state.money -= state.levelCost; state.level++; state.income = Math.floor(state.income*1.85 + state.level); state.levelCost = Math.floor(state.levelCost*2.2 + 700); updateUI(); showHint('Seviye arttı'); }
 
     function spawnCustomer(){
-      const openLots = purchasedLots();
-      if (!openLots.length) return;
-
-      const lot = openLots[randi(0, openLots.length - 1)];
       const colors = [0x4e7bf7,0xef6a55,0x35b86f,0x915fff,0xf4b43e,0x10a8c9];
+      const mesh = makeCustomer(colors[randi(0, colors.length-1)]);
+      const qIndex = Math.min(state.queue.length, queueTargets.length-1);
+      const target = queueTargets[qIndex] || new THREE.Vector3(0,.02,3.15);
+      mesh.position.set(-18,0,-5.6);
+      customersGroup.add(mesh);
+      state.queue.push({ mesh, x:-18, z:-5.6, target, speed:rand(4.2,5.2), wait:rand(.8,1.5), phase:'going' });
+    }
 
-      const mesh = makeCustomer(colors[randi(0, colors.length - 1)]);
-      mesh.position.set(-18, 0, -5.2);
-      customerGroup.add(mesh);
-
-      state.customers.push({
-        mesh,
-        lotId: lot.id,
-        x: -18,
-        targetX: lot.x,
-        speed: rand(4.2, 5.4),
-        wait: rand(.7, 1.5),
-        phase: 'going'
-      });
+    function updateQueueTargets(){
+      for(let i=0;i<state.queue.length;i++){
+        const t = queueTargets[Math.min(i, queueTargets.length-1)] || queueTargets[queueTargets.length-1];
+        state.queue[i].target = t;
+      }
     }
 
     function updateCustomers(dt, now){
-      for (let i = state.customers.length - 1; i >= 0; i--){
-        const c = state.customers[i];
-
-        if (c.phase === 'going'){
-          c.x += c.speed * dt;
-          if (c.x >= c.targetX){
-            c.x = c.targetX;
-            c.phase = 'wait';
-          }
-        } else if (c.phase === 'wait'){
+      updateQueueTargets();
+      for(let i=state.queue.length-1;i>=0;i--){
+        const c = state.queue[i];
+        if(c.phase==='going'){
+          c.x += c.speed*dt;
+          c.z += (c.target.z - c.z)*0.08;
+          if(c.x >= c.target.x){ c.x = c.target.x; c.phase = i===0 ? 'wait' : 'queue'; }
+        } else if(c.phase==='queue') {
+          c.x += (c.target.x - c.x)*0.08;
+          c.z += (c.target.z - c.z)*0.08;
+          if(i===0) c.phase='wait';
+        } else if(c.phase==='wait'){
           c.wait -= dt;
-          if (c.wait <= 0){
-            c.phase = 'leave';
-
-            const lot = state.lots.find(l => l.id === c.lotId);
-            if (lot){
-              const pay = Math.max(1, Math.floor(lot.income * rand(1.2, 1.9)));
-              state.money += pay;
-              state.customersServed += 1;
-            }
-
+          c.x += (c.target.x - c.x)*0.08;
+          c.z += (c.target.z - c.z)*0.08;
+          if(c.wait<=0){
+            c.phase='leave';
+            const pay = Math.max(1, Math.floor(state.income * rand(1.2,1.9)));
+            state.money += pay;
+            state.customersServed++;
             updateUI();
           }
         } else {
-          c.x -= c.speed * 1.25 * dt;
-          if (c.x < -24){
-            customerGroup.remove(c.mesh);
-            state.customers.splice(i, 1);
-            continue;
-          }
+          c.x -= c.speed*1.3*dt;
+          c.z -= 1.2*dt;
+          if(c.x < -24){ customersGroup.remove(c.mesh); state.queue.splice(i,1); continue; }
         }
-
-        c.mesh.position.x = c.x;
-        c.mesh.position.z = -5.2;
-        c.mesh.rotation.y = c.phase === 'leave' ? Math.PI : 0;
-
-        const wob = Math.sin(now * 0.01 + i) * 0.04;
-        c.mesh.position.y = Math.abs(wob);
-        c.mesh.userData.leg1.rotation.x = wob * 4;
-        c.mesh.userData.leg2.rotation.x = -wob * 4;
+        c.mesh.position.set(c.x, Math.abs(Math.sin(now*0.01+i))*0.04, c.z);
+        c.mesh.rotation.y = c.phase==='leave' ? Math.PI : 0;
+        c.mesh.userData.leg1.rotation.x = Math.sin(now*0.015+i)*0.4;
+        c.mesh.userData.leg2.rotation.x = -Math.sin(now*0.015+i)*0.4;
       }
     }
 
     function updateProduction(dt, now){
-      for (const lot of purchasedLots()){
-        lot.progress += dt * lot.chefs;
-
-        while (lot.progress >= lot.speed){
-          lot.progress -= lot.speed;
-          state.money += lot.income;
-        }
-
-        if (lot.coin){
-          lot.coin.rotation.z += dt * 2;
-          lot.coin.position.y = 1.25 + Math.sin(now * 0.003 + lot.id) * 0.12;
-        }
-
-        for (let i = 0; i < lot.chefMeshes.length; i++){
-          const chef = lot.chefMeshes[i];
-          const t = now * 0.006 + i;
-          chef.userData.leg1.rotation.x = Math.sin(t) * 0.35;
-          chef.userData.leg2.rotation.x = -Math.sin(t) * 0.35;
-          chef.position.z = -.2 + Math.sin(t * 0.7) * 0.08;
-        }
-      }
+      state.progress += dt * state.chefs;
+      while(state.progress >= state.speed){ state.progress -= state.speed; state.money += state.income; }
+      if(restaurant.userData.coin){ restaurant.userData.coin.rotation.z += dt*2; restaurant.userData.coin.position.y = 1.1 + Math.sin(now*0.003)*0.12; }
+      chefMeshes.forEach((chef,i)=>{ const t = now*0.006+i; chef.userData.leg1.rotation.x = Math.sin(t)*0.35; chef.userData.leg2.rotation.x = -Math.sin(t)*0.35; chef.position.z = -.15 + Math.sin(t*0.7)*0.06; });
     }
 
     function updateSpawner(dt){
       state.customerSpawnTimer -= dt;
-      const openCount = purchasedLots().length;
-      const interval = Math.max(0.55, 2.1 - openCount * 0.24 - state.floor * 0.08);
-
-      if (state.customerSpawnTimer <= 0){
-        state.customerSpawnTimer = interval;
-        spawnCustomer();
-      }
+      const interval = Math.max(.6, 2 - state.widthLevel*0.18 - state.level*0.06);
+      if(state.customerSpawnTimer <= 0 && state.queue.length < Math.max(4, 2 + state.widthLevel)){ state.customerSpawnTimer = interval; spawnCustomer(); }
     }
 
-    function updateCamera(){
-      state.camTargetX = clamp(state.camTargetX, 0, (state.lots.length - 1) * 9);
-      camera.position.x += (state.camTargetX - camera.position.x) * 0.1;
-      camera.lookAt(camera.position.x, 1.5, 0);
-    }
+    function updateCamera(){ state.camTargetX = clamp(state.camTargetX, -4, 4); camera.position.x += (state.camTargetX - camera.position.x)*0.1; camera.lookAt(camera.position.x, 1.5, .4); }
+    function onDown(e){ state.dragging = true; state.prevX = e.touches ? e.touches[0].clientX : e.clientX; }
+    function onMove(e){ if(!state.dragging) return; const x = e.touches ? e.touches[0].clientX : e.clientX; const dx = x - state.prevX; state.prevX = x; state.camTargetX -= dx*0.02; }
+    function onUp(){ state.dragging = false; }
+    renderer.domElement.addEventListener('mousedown', onDown); window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp); renderer.domElement.addEventListener('touchstart', onDown, { passive:true }); window.addEventListener('touchmove', onMove, { passive:true }); window.addEventListener('touchend', onUp, { passive:true });
 
-    function onDown(e){
-      state.dragging = true;
-      state.prevX = e.touches ? e.touches[0].clientX : e.clientX;
-    }
+    document.getElementById('startBtn').addEventListener('click', ()=>{ menuEl.style.display='none'; showHint('Oyun başladı'); });
+    document.getElementById('menuUpgradesBtn').addEventListener('click', ()=>{ menuEl.style.display='none'; panelEl.classList.add('open'); });
+    document.getElementById('fab').addEventListener('click', ()=>panelEl.classList.toggle('open'));
+    document.getElementById('closeBtn').addEventListener('click', ()=>panelEl.classList.remove('open'));
+    hireBtn.addEventListener('click', hireChef); valueBtn.addEventListener('click', upgradeValue); speedBtn.addEventListener('click', upgradeSpeed); expandBtn.addEventListener('click', expand); floorBtn.addEventListener('click', prestige);
 
-    function onMove(e){
-      if (!state.dragging) return;
-      const x = e.touches ? e.touches[0].clientX : e.clientX;
-      const dx = x - state.prevX;
-      state.prevX = x;
-      state.camTargetX -= dx * 0.035;
-    }
+    window.addEventListener('resize', ()=>{ camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 
-    function onUp(){
-      state.dragging = false;
-    }
-
-    renderer.domElement.addEventListener('mousedown', onDown);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    renderer.domElement.addEventListener('touchstart', onDown, { passive:true });
-    window.addEventListener('touchmove', onMove, { passive:true });
-    window.addEventListener('touchend', onUp, { passive:true });
-
-    document.getElementById('startBtn').addEventListener('click', () => {
-      menuEl.style.display = 'none';
-      showHint('Oyun başladı');
-    });
-
-    document.getElementById('menuUpgradesBtn').addEventListener('click', () => {
-      menuEl.style.display = 'none';
-      panelEl.classList.add('open');
-    });
-
-    document.getElementById('fab').addEventListener('click', () => {
-      panelEl.classList.toggle('open');
-    });
-
-    document.getElementById('closeBtn').addEventListener('click', () => {
-      panelEl.classList.remove('open');
-    });
-
-    hireBtn.addEventListener('click', hireChef);
-    valueBtn.addEventListener('click', upgradeValue);
-    speedBtn.addEventListener('click', upgradeSpeed);
-    expandBtn.addEventListener('click', expand);
-    floorBtn.addEventListener('click', openNewFloor);
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    function animate(now){
-      const dt = Math.min(0.05, (now - state.lastTime) / 1000);
-      state.lastTime = now;
-
-      updateProduction(dt, now);
-      updateCustomers(dt, now);
-      updateSpawner(dt);
-      updateCamera();
-      updateUI();
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
+    function animate(now){ const dt = Math.min(0.05, (now - state.lastTime)/1000); state.lastTime = now; updateProduction(dt, now); updateCustomers(dt, now); updateSpawner(dt); updateCamera(); updateUI(); renderer.render(scene, camera); requestAnimationFrame(animate); }
 
     updateUI();
-    showHint('Hazır');
+    showHint('Açık üst sushi bar hazır');
     requestAnimationFrame(animate);
   </script>
 </body>
